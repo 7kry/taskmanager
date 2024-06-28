@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{{ get_translation('Language Preference') }}</h2>
+  <form method="post" action="{{ url_for('set_language') }}">
+    <div class="form-group">
+      <label for="language">{{ get_translation('Select Language') }}</label>
+      <select class="form-control" id="language" name="language">
+        <option value="ja" {% if current_user.language == 'ja' %}selected{% endif %}>Japanese</option>
+        <option value="en" {% if current_user.language == 'en' %}selected{% endif %}>English</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">{{ get_translation('Update Language') }}</button>
+  </form>
+{% endblock %}
+<!-- vim:ft=2:ts=2:sts=2:sw=2:et -->

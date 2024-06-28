@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Companies</h2>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+      {{ form.name.label }}
+      {{ form.name(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+  </form>
+{% endblock %}
+<!-- vim:ft=2:ts=2:sts=2:sw=2:et -->

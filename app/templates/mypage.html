@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>My Page</h2>
-  <p>Welcome to your page, {{ current_user.username }}!</p>
+  <h2>{{ get_translation('My Page') }}</h2>
+  <p>{{ get_translation('Welcome to your page') }}, {{ current_user.username }}!</p>
 {% endblock %}
+<!-- vim:ft=2:ts=2:sts=2:sw=2:et -->

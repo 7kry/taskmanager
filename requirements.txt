@@ -4,3 +4,4 @@ Flask-Migrate
 Flask-Login
 SQLAlchemy
 alembic
+# vim:ft=2:ts=2:sts=2:sw=2:et

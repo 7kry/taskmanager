@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>User Information</h2>
-  <p>Username: {{ user.username }}</p>
-  <p>User ID: {{ user.id }}</p>
+  <h2>{{ get_translation('User Information') }}</h2>
+  <p>{{ get_translation('Username') }}: {{ user.username }}</p>
+  <p>{{ get_translation('User ID') }}: {{ user.id }}</p>
   {% if current_user.username == user.username %}
-  <p><a href="{{ url_for('mypage') }}" class="btn btn-link">Go to My Page</a></p>
+  <p><a href="{{ url_for('mypage') }}" class="btn btn-link">{{ get_translation('Go to My Page') }}</a></p>
   {% endif %}
-  <p><a href="{{ url_for('index') }}" class="btn btn-link">Back to Home</a></p>
+  <p><a href="{{ url_for('index') }}" class="btn btn-link">{{ get_translation('Back to Home') }}</a></p>
 {% endblock %}
+<!-- vim:ft=2:ts=2:sts=2:sw=2:et -->

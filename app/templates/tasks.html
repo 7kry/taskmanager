@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Tasks</h2>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+      {{ form.task_type.label }} 
+      {{ form.task_type(class="form-control", id="taskType") }}
+      <span class="badge badge-pill badge-info d-none" id="taskTypePlate"></span>
+    </div>
+    <div class="form-group">
+      {{ form.companies.label }}
+      {{ form.companies(class="form-control", id="companies") }}
+      <span class="badge badge-pill badge-info d-none" id="companiesPlate"></span>
+    </div>
+    <div class="form-group">
+      {{ form.required_time.label }}
+      {{ form.required_time(class="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ form.order_to.label }}
+      {{ form.order_to(class="form-control", id="orderTo") }}
+      <span class="badge badge-pill badge-info d-none" id="orderToPlate"></span>
+    </div>
+    <div class="form-group form-check">
+      {{ form.delegation(class="form-check-input", id="delegation") }}
+      <label class="form-check-label" for="delegation">{{ form.delegation.label.text }}</label>
+    </div>
+    <div class="form-group d-none" id="orderedByContainer">
+      {{ form.ordered_by.label }}
+      {{ form.ordered_by(class="form-control", id="orderedBy") }}
+      <span class="badge badge-pill badge-info d-none" id="orderedByPlate"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+  </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function createPlate(text, inputId, plateId) {
+    $(`#${inputId}`).hide();
+    $(`#${plateId}`).text(text).removeClass('d-none');
+  }
+
+  function handleAutocomplete(inputId, plateId, checkUrl) {
+    $(`#${inputId}`).autocomplete({
+      source: function(request, response) {
+        $.ajax({
+          url: checkUrl,
+          data: { q: request.term },
+          success: function(data) {
+            if (data.exists) {
+              response(data.results);
+            } else {
+              response([{ label: '<em>Create new</em>', value: request.term, createNew: true }]);
+            }
+          }
+        });
+      },
+      minLength: 2,
+      select: function(event, ui) {
+        if (ui.item.createNew) {
+          createPlate(ui.item.value, inputId, plateId);
+        } else {
+          $(`#${inputId}`).val(ui.item.value);
+          createPlate(ui.item.value, inputId, plateId);
+        }
+      }
+    }).autocomplete("instance")._renderItem = function(ul, item) {
+      return $("<li>")
+        .append("<div>" + item.label + "</div>")
+        .appendTo(ul);
+    };
+  }
+
+  $(function() {
+    handleAutocomplete('taskType', 'taskTypePlate', "{{ url_for('check_task_type') }}");
+    handleAutocomplete('companies', 'companiesPlate', "{{ url_for('check_company') }}");
+    handleAutocomplete('orderTo', 'orderToPlate', "{{ url_for('check_user') }}");
+    handleAutocomplete('orderedBy', 'orderedByPlate', "{{ url_for('check_user') }}");
+
+    $("#taskTypePlate").click(function() {
+      $(this).addClass('d-none');
+      $("#taskType").show().focus();
+    });
+
+    $("#companiesPlate").click(function() {
+      $(this).addClass('d-none');
+      $("#companies").show().focus();
+    });
+
+    $("#orderToPlate").click(function() {
+      $(this).addClass('d-none');
+      $("#orderTo").show().focus();
+    });
+
+    $("#orderedByPlate").click(function() {
+      $(this).addClass('d-none');
+      $("#orderedBy").show().focus();
+    });
+
+    $("#delegation").change(function() {
+      if (this.checked) {
+        $("#orderedByContainer").removeClass('d-none');
+      } else {
+        $("#orderedByContainer").addClass('d-none');
+      }
+    });
+  });
+</script>
+{% endblock %}
+<!-- vim:ts=2:sts=2:sw=2:et -->
