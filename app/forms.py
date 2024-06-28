@@ -1,14 +1,16 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, BooleanField
+from wtforms import StringField, IntegerField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, NumberRange
 
 class TaskForm(FlaskForm):
     task_type = StringField('Task Type', validators=[DataRequired()])
+    task_detail = StringField('Task Detail', validators=[DataRequired()])
     companies = StringField('Companies')
     required_time = IntegerField('Required Time (minutes)', validators=[DataRequired(), NumberRange(min=1)])
     order_to = StringField('Order To', validators=[DataRequired()])
     delegation = BooleanField('Delegation')
     ordered_by = StringField('Ordered by')
+    message = TextAreaField('Message')
     submit = SubmitField('Create Task')
 
 class TaskTypeForm(FlaskForm):

@@ -2,17 +2,21 @@
 
 {% block content %}
   <h2>Tasks</h2>
-  <form method="post">
+  <form method="post" id="taskForm">
     {{ form.hidden_tag() }}
     <div class="form-group">
       {{ form.task_type.label }} 
       {{ form.task_type(class="form-control", id="taskType") }}
-      <span class="badge badge-pill badge-info d-none" id="taskTypePlate"></span>
+      <span class="badge badge-pill badge-info badge-lg d-none" id="taskTypePlate"></span>
+    </div>
+    <div class="form-group">
+      {{ form.task_detail.label }}
+      {{ form.task_detail(class="form-control") }}
     </div>
     <div class="form-group">
       {{ form.companies.label }}
+      <div id="companiesContainer"></div>
       {{ form.companies(class="form-control", id="companies") }}
-      <span class="badge badge-pill badge-info d-none" id="companiesPlate"></span>
     </div>
     <div class="form-group">
       {{ form.required_time.label }}
@@ -21,7 +25,7 @@
     <div class="form-group">
       {{ form.order_to.label }}
       {{ form.order_to(class="form-control", id="orderTo") }}
-      <span class="badge badge-pill badge-info d-none" id="orderToPlate"></span>
+      <span class="badge badge-pill badge-info badge-lg d-none" id="orderToPlate"></span>
     </div>
     <div class="form-group form-check">
       {{ form.delegation(class="form-check-input", id="delegation") }}
@@ -30,9 +34,13 @@
     <div class="form-group d-none" id="orderedByContainer">
       {{ form.ordered_by.label }}
       {{ form.ordered_by(class="form-control", id="orderedBy") }}
-      <span class="badge badge-pill badge-info d-none" id="orderedByPlate"></span>
+      <span class="badge badge-pill badge-info badge-lg d-none" id="orderedByPlate"></span>
     </div>
-    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+    <div class="form-group">
+      {{ form.message.label }}
+      {{ form.message(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary" id="submitBtn">{{ form.submit.label }}</button>
   </form>
 {% endblock %}
 
@@ -43,7 +51,12 @@
     $(`#${plateId}`).text(text).removeClass('d-none');
   }
 
-  function handleAutocomplete(inputId, plateId, checkUrl) {
+  function createCompanyPlate(text) {
+    const id = `companyPlate_${text.replace(/\s+/g, '_')}`;
+    return `<span class="badge badge-pill badge-info badge-lg mr-2" id="${id}" style="margin-right: 5px;">${text}<i class="ml-2 fas fa-times" onclick="removeCompany('${id}', '${text}')"></i></span>`;
+  }
+
+  function handleAutocomplete(inputId, plateId, checkUrl, enableCreateNew) {
     $(`#${inputId}`).autocomplete({
       source: function(request, response) {
         $.ajax({
@@ -52,7 +65,7 @@
           success: function(data) {
             if (data.exists) {
               response(data.results);
-            } else {
+            } else if (enableCreateNew) {
               response([{ label: '<em>Create new</em>', value: request.term, createNew: true }]);
             }
           }
@@ -61,11 +74,20 @@
       minLength: 2,
       select: function(event, ui) {
         if (ui.item.createNew) {
-          createPlate(ui.item.value, inputId, plateId);
+          if (inputId === 'companies') {
+            addCompany(ui.item.value);
+          } else {
+            createPlate(ui.item.value, inputId, plateId);
+          }
         } else {
-          $(`#${inputId}`).val(ui.item.value);
-          createPlate(ui.item.value, inputId, plateId);
+          if (inputId === 'companies') {
+            addCompany(ui.item.value);
+          } else {
+            $(`#${inputId}`).val(ui.item.value);
+            createPlate(ui.item.value, inputId, plateId);
+          }
         }
+        validateForm();
       }
     }).autocomplete("instance")._renderItem = function(ul, item) {
       return $("<li>")
@@ -74,30 +96,65 @@
     };
   }
 
+  function addCompany(company) {
+    const companiesContainer = $('#companiesContainer');
+    const companies = companiesContainer.children().map(function() {
+      return $(this).text().trim();
+    }).get();
+
+    if (!companies.includes(company)) {
+      companiesContainer.append(createCompanyPlate(company));
+      $('#companies').val('');
+    } else {
+      alert('Company already added.');
+    }
+  }
+
+  function removeCompany(id, company) {
+    $(`#${id}`).remove();
+    validateForm();
+  }
+
+  function validateForm() {
+    let valid = true;
+
+    if ($('#taskType').val() === '' && $('#taskTypePlate').hasClass('d-none')) {
+      valid = false;
+    }
+    if ($('#orderTo').val() === '' && $('#orderToPlate').hasClass('d-none')) {
+      valid = false;
+    }
+    if ($('#delegation').prop('checked')) {
+      if ($('#orderedBy').val() === '' && $('#orderedByPlate').hasClass('d-none')) {
+        valid = false;
+      }
+    }
+
+    $('#submitBtn').prop('disabled', !valid);
+  }
+
   $(function() {
-    handleAutocomplete('taskType', 'taskTypePlate', "{{ url_for('check_task_type') }}");
-    handleAutocomplete('companies', 'companiesPlate', "{{ url_for('check_company') }}");
+    handleAutocomplete('taskType', 'taskTypePlate', "{{ url_for('check_task_type') }}", true);
+    handleAutocomplete('companies', '', "{{ url_for('check_company') }}", true);
     handleAutocomplete('orderTo', 'orderToPlate', "{{ url_for('check_user') }}");
     handleAutocomplete('orderedBy', 'orderedByPlate', "{{ url_for('check_user') }}");
 
     $("#taskTypePlate").click(function() {
       $(this).addClass('d-none');
       $("#taskType").show().focus();
-    });
-
-    $("#companiesPlate").click(function() {
-      $(this).addClass('d-none');
-      $("#companies").show().focus();
+      validateForm();
     });
 
     $("#orderToPlate").click(function() {
       $(this).addClass('d-none');
       $("#orderTo").show().focus();
+      validateForm();
     });
 
     $("#orderedByPlate").click(function() {
       $(this).addClass('d-none');
       $("#orderedBy").show().focus();
+      validateForm();
     });
 
     $("#delegation").change(function() {
@@ -106,8 +163,15 @@
       } else {
         $("#orderedByContainer").addClass('d-none');
       }
+      validateForm();
     });
+
+    $("#taskType, #orderTo, #orderedBy").on('input', validateForm);
+
+    validateForm();
   });
 </script>
 {% endblock %}
-<!-- vim:ts=2:sts=2:sw=2:et -->
+<!--
+  vim:ts=2:sts=2:sw=2:et
+-->

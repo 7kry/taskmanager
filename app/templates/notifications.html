@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Notifications</h2>
+  <ul class="list-group">
+    {% for notification in notifications %}
+      <li class="list-group-item">
+        <span>{{ notification.message }}</span>
+        <span class="float-right text-muted">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+<!-- vim:ts=2:sts=2:sw=2:et -->

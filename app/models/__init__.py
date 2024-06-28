@@ -1,11 +1,7 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-
-db = SQLAlchemy()
-login = LoginManager()
-login.login_view = 'login'
-
 from .user import User
-from .task import TaskType, Company, Task
+from .task import Task
+from .task_type import TaskType
+from .company import Company
+from .notification import Notification
 
-# vim:ft=2:ts=2:sts=2:sw=2:et
+# vim:ts=2:sts=2:sw=2:et

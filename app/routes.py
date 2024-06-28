@@ -1,11 +1,12 @@
 from flask import current_app as app
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import db
-from app.models import User, TaskType, Company, Task
+from app.models import User, TaskType, Company, Task, Notification
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from werkzeug.security import generate_password_hash
 from app.forms import TaskForm, TaskTypeForm, CompanyForm
+from datetime import datetime
 
 @app.route('/')
 @app.route('/index')
@@ -140,9 +141,27 @@ def tasks():
       if not ordered_by:
         flash('Ordered by user not found')
         return render_template('tasks.html', title='Tasks', form=form)
-    task = Task(task_type=task_type, companies=companies_objs, required_time=form.required_time.data, ordered_by=ordered_by, order_to=order_to)
+    task = Task(
+      task_type_id=task_type.id,
+      task_detail=form.task_detail.data,
+      companies=companies_objs,
+      required_time=form.required_time.data,
+      ordered_by_id=ordered_by.id,
+      order_to_id=order_to.id,
+      message=form.message.data
+    )
     db.session.add(task)
     db.session.commit()
+    
+    # Create notification for the user
+    notification = Notification(
+      user_id=order_to.id,
+      message=f"You have a new task assigned by {ordered_by.username}",
+      timestamp=datetime.utcnow()
+    )
+    db.session.add(notification)
+    db.session.commit()
+    
     flash('Task created successfully')
     return redirect(url_for('tasks'))
   return render_template('tasks.html', title='Tasks', form=form)
@@ -170,5 +189,22 @@ def companies():
     flash('Company added successfully')
     return redirect(url_for('companies'))
   return render_template('companies.html', title='Companies', form=form)
+
+@app.route('/notifications')
+@login_required
+def notifications():
+  notifications = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.timestamp.desc()).all()
+  return render_template('notifications.html', title='Notifications', notifications=notifications)
+
+@app.route('/check_notifications')
+@login_required
+def check_notifications():
+  notifications = Notification.query.filter_by(user_id=current_user.id, read=False).order_by(Notification.timestamp.desc()).all()
+  notifications_list = [{'message': notification.message, 'timestamp': notification.timestamp.strftime('%Y-%m-%d %H:%M:%S')} for notification in notifications]
+  # Mark notifications as read
+  for notification in notifications:
+    notification.read = True
+  db.session.commit()
+  return jsonify(notifications_list)
 
 # vim:ts=2:sts=2:sw=2:et

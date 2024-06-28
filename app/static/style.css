@@ -1,6 +1,14 @@
 .badge-info {
   background-color: #17a2b8;
   color: white;
-  margin-left: 5px;
+  cursor: pointer;
+}
+
+.badge-lg {
+  font-size: 1.25em;
+  padding: 0.5em 1em;
+}
+
+.badge-lg .fas {
   cursor: pointer;
 }
