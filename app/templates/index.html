@@ -1,6 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>{{ get_translation('Welcome') }} to TaskManager!</h1>
+  {% if current_user.is_authenticated %}
+    <table>
+      <tbody>
+    {% for task in tasks %}
+      <tr>
+        <td>
+          <div>{{ task.task_type.name }}</div>
+          <div>{{ task.task_detail }}</div>
+        </td>
+        <td>
+          <ul>
+            {% for com in task.companies %}
+              <li>{{ com.name }}</li>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>
+          {{ task.required_time }}
+        </td>
+        <td>
+          {{ task.ordered_by.username }}
+        </td>
+        <td>
+          {{ task.message }}
+        </td>
+      </tr>
+    {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
 {% endblock %}
-<!-- vim:ft=2:ts=2:sts=2:sw=2:et -->
+<!-- vim:ts=2:sts=2:sw=2:et
+-->

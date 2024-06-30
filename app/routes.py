@@ -7,12 +7,14 @@ from werkzeug.urls import url_parse
 from werkzeug.security import generate_password_hash
 from app.forms import TaskForm, TaskTypeForm, CompanyForm
 from datetime import datetime
+from sqlalchemy import and_, or_
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-  return render_template('index.html', title='Home')
+  tasks = Task.query.filter(and_(Task.order_to_id == current_user.id, Task.is_completed == False)).all()
+  return render_template('index.html', title='Home', tasks=tasks, p=print)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

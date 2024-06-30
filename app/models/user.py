@@ -8,6 +8,9 @@ class User(UserMixin, db.Model):
   password_hash = db.Column(db.String(128))
   language = db.Column(db.String(2), default='en')
 
+  tasks_ordered = db.relationship('Task', foreign_keys='Task.ordered_by_id', backref='ordered_by', lazy='dynamic')
+  tasks_received = db.relationship('Task', foreign_keys='Task.order_to_id', backref='order_to', lazy='dynamic')
+
   def set_password(self, password):
     self.password_hash = generate_password_hash(password)
 
