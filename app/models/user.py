@@ -6,7 +6,7 @@ class User(UserMixin, db.Model):
   id = db.Column(db.Integer, primary_key=True)
   username = db.Column(db.String(64), index=True, unique=True)
   password_hash = db.Column(db.String(128))
-  language = db.Column(db.String(2), default='ja')  # Default language is Japanese
+  language = db.Column(db.String(2), default='en')
 
   def set_password(self, password):
     self.password_hash = generate_password_hash(password)
@@ -18,4 +18,4 @@ class User(UserMixin, db.Model):
 def load_user(id):
   return User.query.get(int(id))
 
-# vim:ft=2:ts=2:sts=2:sw=2:et
+# vim:ts=2:sts=2:sw=2:et

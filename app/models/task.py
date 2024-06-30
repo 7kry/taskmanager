@@ -14,6 +14,7 @@ class Task(db.Model):
     ordered_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     order_to_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     message = db.Column(db.Text)
+    is_completed = db.Column(db.Boolean, default=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 # vim:ts=2:sts=2:sw=2:et

@@ -41,18 +41,11 @@
           </li>
           {% if current_user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('mypage') }}">{{ get_translation('My Page') }}</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="{{ url_for('tasks') }}">{{ get_translation('Create Task') }}</a>
           </li>
           {% endif %}
         </ul>
         {% if current_user.is_authenticated %}
-        <form class="form-inline my-2 my-lg-0 mr-3 navbar-search">
-          <i class="fas fa-search"></i>
-          <input class="form-control mr-sm-2" type="search" placeholder="{{ get_translation('Search users') }}" aria-label="Search" id="userSearch">
-        </form>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('notifications') }}">
@@ -61,11 +54,6 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('preferences') }}">
-              <i class="fas fa-cog"></i>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('user', username=current_user.username) }}">
               <i class="fas fa-user"></i> {{ current_user.username }}
             </a>
           </li>
@@ -148,4 +136,5 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
-<!-- vim:ts=2:sts=2:sw=2:et -->
+<!-- vim:ts=2:sts=2:sw=2:et 
+-->
